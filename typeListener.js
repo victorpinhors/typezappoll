@@ -37,15 +37,15 @@ console.log("Bem-vindo ao TypeZap 1.0 - A Integração mais completa Typebot + W
 console.log(`Nome da sessão: ${sessao}`);
 
 // Configurações para o primeiro cliente (Windows)
-const client = new Client({
+/*const client = new Client({
     authStrategy: new LocalAuth({ clientId: sessao }),
     puppeteer: {
       executablePath: 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
     }
-  });
+  });*/
   
   //Kit com os comandos otimizados para nuvem Ubuntu Linux (créditos Pedrinho da Nasa Comunidade ZDG)
-  /*const client = new Client({
+  const client = new Client({
     authStrategy: new LocalAuth({ clientId: sessao }),
     puppeteer: {
       headless: true,
@@ -69,7 +69,7 @@ const client = new Client({
         '--disable-gpu'
       ]
     }
-  });*/
+  });
   
 // entao habilitamos o usuario a acessar o serviço de leitura do qr code
 client.on('qr', qr => {
@@ -2258,7 +2258,7 @@ Comando: "!grupoexcluir"
 
 Insira a URL do seu Typebot, por exemplo:
 https://seutypebot.vm.elestio.app/api/v1/sessions/`, "text");
-await delay(2000);
+await delay(3000);
 addObjectSelf(msg.from, 'stepAtivar01', JSON.stringify(msg.id.id), 'done', null, null, null);
   }
 
@@ -2296,7 +2296,7 @@ Por exemplo:\nhttps://seutype.vm.elestio.app/api/v1/typebots/seufunil/startChat\
 
 _Resete o processo a qualquer momento digitando "00"_
 *Insira o link abaixo* ⬇️`, "text");
-    await delay(2000);
+    await delay(3000);
     addObjectSelf(msg.from, 'stepAdicionar01', JSON.stringify(msg.id.id), 'done', null, null, null);
    
   }
@@ -2389,7 +2389,7 @@ Insira o nome do fluxo para ser excluido. 📝
 
 _Resete o processo a qualquer momento digitando "00"_
 *Escreva o nome abaixo* ⬇️`, "text");
-     await delay(2000);
+     await delay(3000);
      addObjectSelf(msg.from, 'stepExcluir01', JSON.stringify(msg.id.id), 'done', null, null, null);
      
   }
@@ -2426,7 +2426,7 @@ Por exemplo:\nmeufluxo\n 🛍️💬
 
 _Resete o processo a qualquer momento digitando "00"_
 *Escreva abaixo* ⬇️`,"text");
-await delay(2000);
+await delay(3000);
      addObjectSelf(msg.from, 'stepRapida01', JSON.stringify(msg.id.id), 'done', null, null, null);
      
   }
@@ -2484,7 +2484,7 @@ Insira o nome da Resposta Rápida para ser excluida. 📝
 
 _Resete o processo a qualquer momento digitando "00"_
 *Escreva o nome abaixo* ⬇️`,"text");
-await delay(2000);
+await delay(3000);
      addObjectSelf(msg.from, 'stepRapidaExcluir01', JSON.stringify(msg.id.id), 'done', null, null, null);     
   }
 
@@ -2517,7 +2517,7 @@ Por exemplo:\nhttps://seutype.vm.elestio.app/api/v1/typebots/funilremarketing/st
 
 _Resete o processo a qualquer momento digitando "00"_
 *Insira o link abaixo* ⬇️`,"text");
-await delay(2000);
+await delay(3000);
      addObjectSelf(msg.from, 'stepRmkt01', JSON.stringify(msg.id.id), 'done', null, null, null);
      
   }
@@ -2603,7 +2603,7 @@ Insira o URL do fluxo de Remarketing que iremos excluir. 📝
 
 _Resete o processo a qualquer momento digitando "00"_
 *Escreva o URL abaixo* ⬇️`,"text");
-await delay(2000);
+await delay(3000);
      addObjectSelf(msg.from, 'stepExcluirRmkt01', JSON.stringify(msg.id.id), 'done', null, null, null);
      
   }
@@ -2634,7 +2634,7 @@ Insira o ID do grupo que iremos excluir. 📝
 
 _Resete o processo a qualquer momento digitando "00"_    
 *Escreva o ID abaixo* ⬇️`,"text");
-await delay(2000);
+await delay(3000);
      addObjectSelf(msg.from, 'stepExcluirGrupo01', JSON.stringify(msg.id.id), 'done', null, null, null);
      
   }
