@@ -205,6 +205,15 @@ function existsDB(numeroId) {
   return dadosAtuais.some(obj => obj.numeroId === numeroId);
 }
 
+function updateSessionId(numeroId, sessionid) {
+  const dadosAtuais = readJSONFile(DATABASE_FILE);
+  const objeto = dadosAtuais.find(obj => obj.numeroId === numeroId);
+  if (objeto) {
+    objeto.sessionid = sessionid;
+    writeJSONFile(DATABASE_FILE, dadosAtuais);
+  }
+}
+
 function readSessionId(numeroId) {
   const objeto = readMap(numeroId);
   return objeto ? objeto.sessionid : undefined;
@@ -628,7 +637,7 @@ async function createSessionJohnnyV2(data, datafrom, url_registro, fluxo) {
             updateFlow(datafrom, "inactive");
           }
         }
-        if (formattedText.startsWith('!optout')) {
+        if (formattedText.startsWith('!optout')) {          
           if (existsDB(datafrom)) {
             updateOptout(datafrom, true);
             removeFromDBTypebotV4(datafrom);
@@ -840,7 +849,7 @@ async function createSessionJohnnyV2(data, datafrom, url_registro, fluxo) {
           formattedText += `▶️ ${item.content}\n`;
           arrayoptions.push(item.content);
         }
-        console.log(arrayoptions)
+        //console.log(arrayoptions)
           // await msg.reply(new Poll('Winter or Summer?', [arrayoptions]));
           // formattedText = formattedText.replace(/\n$/, '');
           await client.sendMessage(datafrom, new Poll('*Escolha uma resposta:*', arrayoptions));
@@ -895,9 +904,15 @@ async function createSessionJohnnyV2(data, datafrom, url_registro, fluxo) {
     if (!existsDB(datafrom) && reinit === false) {
       addObject(datafrom, response.data.sessionId, datafrom.replace(/\D/g, ''), JSON.stringify(data.id.id), 'done', fluxo, false, "active", 400);
     }
+    if(existsDB(datafrom)){
+      updateSessionId(datafrom, response.data.sessionId);
+      updateId(datafrom, JSON.stringify(data.id.id));
+      updateInteract(datafrom, 'done');
+      updateName(datafrom, fluxo);
+    }
     if(reinit === true){
       reinit = false;
-    }
+    }    
   } catch (error) {
     console.log(error);
   }
@@ -1649,7 +1664,7 @@ async function createSessionJohnny(data, url_registro, fluxo) {
           formattedText += `▶️ ${item.content}\n`;
           arrayoptions.push(item.content);
         }
-        console.log(arrayoptions)
+        //console.log(arrayoptions)
           // await msg.reply(new Poll('Winter or Summer?', [arrayoptions]));
           // formattedText = formattedText.replace(/\n$/, '');
           await client.sendMessage(data.from, new Poll('*Escolha uma resposta:*', arrayoptions));
@@ -2050,7 +2065,7 @@ client.on('message', async msg => {
           formattedText += `▶️ ${item.content}\n`;
           arrayoptions.push(item.content);
         }
-        console.log(arrayoptions)
+        //console.log(arrayoptions)
           // await msg.reply(new Poll('Winter or Summer?', [arrayoptions]));
           // formattedText = formattedText.replace(/\n$/, '');
           await client.sendMessage(msg.from, new Poll('*Escolha uma resposta:*', arrayoptions));
@@ -2082,7 +2097,7 @@ async function processMessageV2(msg, msgfrom) {
 
               if (mainTypebotConfig) {
                   // Se encontrou o registro, executa a adição da sessão
-                  deleteObject(msgfrom);
+                  //deleteObject(msgfrom);
                   await createSessionJohnnyV2(msg, msgfrom, mainTypebotConfig.url_registro, mainTypebotConfig.name);
                   await scheduleRemarketing(mainTypebotConfig.name, msgfrom, msg);
                   break; // Sai do loop após encontrar o gatilho correspondente
