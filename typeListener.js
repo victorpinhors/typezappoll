@@ -2,6 +2,7 @@ const fs = require('fs');
 const axios = require('axios');
 const fetch = require('node-fetch');
 const qrcode = require('qrcode-terminal');
+const path = require('path');
 const { Client, Buttons, List, MessageMedia, LocalAuth, Poll } = require('whatsapp-web.js');
 require('dotenv').config();
 
@@ -908,6 +909,7 @@ async function createSessionJohnnyV2(data, datafrom, url_registro, fluxo) {
       updateSessionId(datafrom, response.data.sessionId);
       updateId(datafrom, JSON.stringify(data.id.id));
       updateInteract(datafrom, 'done');
+      updateFlow(datafrom, "active");
       updateName(datafrom, fluxo);
     }
     if(reinit === true){
@@ -2255,6 +2257,9 @@ Comando: "!grupoexcluir"
       
 *Criar Lista de Grupo*
 !listagrupo id_grupo listagrupo.json
+
+*Carregar Lista para Disparo*
+Comando: !listacarregar
       
 *Disparar Mensagens*
 !listadisparo lista.json min_delay max_delay init_pos end_pos nome_fluxo`, "text");    
@@ -2684,13 +2689,67 @@ await delay(3000);
     await sendRequest(msg.from, `${msg.to}`,"text");
   }
 
-  //Criar lista de Grupo
+  //Criar lista de Grupo  
 
   if (msg.fromMe && msg.body.startsWith('!listagrupo') && msg.to === msg.from) {
-    const listaContatos = await extrairGrupo(await extrairNomeArquivo(msg.body,1));
-    await sendRequest(msg.from, `Lista de leads preparada: \n\n${listaContatos.slice(0, 5)}`,"text");
-    writeJSONFile(await extrairNomeArquivo(msg.body,2),listaContatos);
-    await sendRequest(msg.from, `Arquivos com os contatos pronto: \n\n${await extrairNomeArquivo(msg.body,2)}\n\nQuantidade de Contatos extraidos: ${listaContatos.length}`,"text");
+    const listaContatos = await extrairGrupo(await extrairNomeArquivo(msg.body, 1));
+    await sendRequest(msg.from, `Lista de leads preparada: \n\n${listaContatos.slice(0, 5)}`, "text");
+    const nomeArquivo = await extrairNomeArquivo(msg.body, 2);
+    writeJSONFile(nomeArquivo, listaContatos);
+    await sendRequest(msg.from, `Arquivo com os contatos pronto: \n\n${nomeArquivo}\n\nQuantidade de Contatos extraídos: ${listaContatos.length}`, "text");
+  
+    while (true) {
+      try {
+        // Verifica se o arquivo JSON existe na pasta
+        if (fs.existsSync(`./${nomeArquivo}`)) {                
+          const arquivoMedia = MessageMedia.fromFilePath(`./${nomeArquivo}`);
+          //await client.sendMessage(msg.from, MessageMedia.fromFilePath(`./${nomeArquivo}.json`));
+          await client.sendMessage(msg.from, arquivoMedia);
+          break; // Encerra o loop após enviar o arquivo
+        }
+        // Aguarda 1 segundo antes de verificar novamente
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (err) {
+        console.error(err);
+        break; // Encerra o loop em caso de erro
+      }
+    }
+  }
+
+  //Carregar Lista para disparo
+  if (msg.fromMe && msg.body === '!listacarregar' && msg.to === msg.from && !existsDBSelf(msg.from) && !msg.hasMedia) { 
+    await sendRequest(msg.from, `Entendido! 👍
+Insira a lista JSON *formatada* para trabalharmos uma campanha de disparo. 📝
+_(Arraste o arquivo ou compartilhe)_
+
+_Resete o processo a qualquer momento digitando "00"_
+*Carregue o arquivo abaixo* ⬇️`, "text");
+    await delay(3000);
+    addObjectSelf(msg.from, 'stepListaCarregar01', JSON.stringify(msg.id.id), 'done', null, null, null);   
+  }
+
+  if (msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepListaCarregar01' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && msg.hasMedia) {
+    updateInteractSelf(msg.from, 'typing');
+    updateIdSelf(msg.from, JSON.stringify(msg.id.id));
+    
+    const attachmentData = await msg.downloadMedia();
+    // Rotina para baixar a lista e salvar no diretório do projeto
+    if (attachmentData) {
+      const fileName = attachmentData.filename || 'lista.json'; // Define um nome padrão se o nome do arquivo não estiver disponível
+      const filePath = path.join(__dirname, fileName); // __dirname representa o diretório atual do script
+      fs.writeFileSync(filePath, attachmentData.data, 'base64'); // Salva o arquivo no formato base64
+  
+      await sendRequest(msg.from, `Arquivo JSON adicionado com sucesso! 🚀 
+  
+  *Já pode trabalhar a sua campanha de disparos* 🤖👥`, "text");
+      await delay(2000);
+      updateFlowSelf(msg.from, 'stepListaCarregar02');
+      updateInteractSelf(msg.from, 'done');
+      deleteObjectSelf(msg.from);
+    } else {
+      // Lidar com erro caso o arquivo não possa ser baixado
+      await sendRequest(msg.from, `Houve um erro ao adicionar o arquivo. Por favor, tente novamente.`, "text");
+    }
   }
 
   //Disparo para Lista
