@@ -31,6 +31,7 @@ let restartAPI = false;
 const DATABASE_FILE = "typesessaodb.json"
 const sessao = "typeListener";
 const init_delay = 60000; // Exponential Backoff delay
+const db_length = 600; // Tamanho do banco de dados
 
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
@@ -903,7 +904,7 @@ async function createSessionJohnnyV2(data, datafrom, url_registro, fluxo) {
     }
   }
     if (!existsDB(datafrom) && reinit === false) {
-      addObject(datafrom, response.data.sessionId, datafrom.replace(/\D/g, ''), JSON.stringify(data.id.id), 'done', fluxo, false, "active", 400);
+      addObject(datafrom, response.data.sessionId, datafrom.replace(/\D/g, ''), JSON.stringify(data.id.id), 'done', fluxo, false, "active", db_length);
     }
     if(existsDB(datafrom)){
       updateSessionId(datafrom, response.data.sessionId);
@@ -1673,7 +1674,7 @@ async function createSessionJohnny(data, url_registro, fluxo) {
         }
     }
     if (!existsDB(data.from) && reinit === false) {
-      addObject(data.from, response.data.sessionId, data.from.replace(/\D/g, ''), JSON.stringify(data.id.id), 'done', fluxo, false, "active", 400);
+      addObject(data.from, response.data.sessionId, data.from.replace(/\D/g, ''), JSON.stringify(data.id.id), 'done', fluxo, false, "active", db_length);
     }
     if(reinit === true){
       reinit = false;
@@ -2755,30 +2756,44 @@ _Resete o processo a qualquer momento digitando "00"_
   //Disparo para Lista
 
   if (msg.fromMe && msg.body.startsWith('!listadisparo') && msg.to === msg.from) {
-    const listaContatos = readJSONFile(await extrairNomeArquivo(msg.body, 1));
-    const init_pos = await extrairNomeArquivo(msg.body, 4);
-    const end_pos = await extrairNomeArquivo(msg.body, 5);
-    const min_delay = await extrairNomeArquivo(msg.body, 2);
-    const max_delay = await extrairNomeArquivo(msg.body, 3);
-    const fluxo = await extrairNomeArquivo(msg.body, 6);
+    try {
+        const listaContatos = readJSONFile(await extrairNomeArquivo(msg.body, 1));
+        const init_pos = parseInt(await extrairNomeArquivo(msg.body, 4), 10);
+        const end_pos = parseInt(await extrairNomeArquivo(msg.body, 5), 10);
+        const min_delay = parseInt(await extrairNomeArquivo(msg.body, 2), 10);
+        const max_delay = parseInt(await extrairNomeArquivo(msg.body, 3), 10);
+        const fluxo = await extrairNomeArquivo(msg.body, 6);
 
-    await sendRequest(msg.from, `Mínimo Delay: ${min_delay}\nMáximo Delay: ${max_delay}\n\nSegue o topo da lista de contatos, preparando o disparo: \n\n${listaContatos.slice(0, 5)}`,"text");
-    await delay(1000); // Delay de 1 segundo
-    let index = init_pos;
-    const enviarProximaMensagem = async () => {
-      if (index < end_pos) {
-        const contato = listaContatos[index];            
-        // Inserir aqui rotina de disparo do gatilho de V2 para o contato
-        dispararFluxoV2ParaContato(contato, fluxo);
-        const delayAleatorio = Math.floor(Math.random() * (parseInt(max_delay, 10) - parseInt(min_delay, 10) + 1)) + parseInt(min_delay, 10);
-        await sendRequest(msg.from, `Enviei o bloco de remarketing ao numero: ${contato} e com delay de ${delayAleatorio}`,"text");
-        index++;        
-        setTimeout(enviarProximaMensagem, delayAleatorio);        
-      }
-    };
+        if (isNaN(init_pos) || isNaN(end_pos) || isNaN(min_delay) || isNaN(max_delay)) {
+            throw new Error("Um ou mais parâmetros numéricos são inválidos.");
+        }
 
-    enviarProximaMensagem();
-  }
+        if (init_pos < 0 || end_pos < 0 || min_delay < 0 || max_delay < 0 || end_pos < init_pos) {
+            throw new Error("Os valores de posição ou delay estão fora dos limites permitidos.");
+        }
+
+        const subListaContatos = listaContatos.slice(init_pos, end_pos + 1);
+
+        await sendRequest(msg.from, `Mínimo Delay: ${min_delay}\nMáximo Delay: ${max_delay}\nContatos da Lista: ${subListaContatos.length}\n\nSegue o topo da sublista de contatos, preparando o disparo: \n\n${subListaContatos.slice(0, 5)}`, "text");
+        await delay(1000); // Delay de 1 segundo
+
+        const enviarProximaMensagem = async (index) => {
+            if (index < subListaContatos.length) {
+                const contato = subListaContatos[index];
+                // Inserir aqui rotina de disparo do gatilho de V2 para o contato
+                dispararFluxoV2ParaContato(contato, fluxo);
+                const delayAleatorio = Math.floor(Math.random() * (max_delay - min_delay + 1)) + min_delay;
+                await sendRequest(msg.from, `Disparo ${index + 1}/${subListaContatos.length}: Enviei o bloco de remarketing ao número: ${contato} e com delay de ${delayAleatorio}`, "text");
+
+                setTimeout(() => enviarProximaMensagem(index + 1), delayAleatorio);
+            }
+        };
+
+        enviarProximaMensagem(0);
+    } catch (error) {
+        await sendRequest(msg.from, `Erro: ${error.message}`, "text");
+    }
+}
 
 });
 
