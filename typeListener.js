@@ -2226,81 +2226,73 @@ client.on('message_create', async (msg) => {
   // Comandos do central de controle
   if (msg.fromMe && msg.body.startsWith('!help') && msg.to === msg.from) {        
     
-  // Chamar sendRequest ao invés de client.sendMessage
-  await sendRequest(msg.from, `*Sistema de Controle v1.0 - TypeZap*
-
-*Preparar Typebot (primeira ação)*
-Comando: "!ativar"
-
-*Adicionar Novo Fluxo*
-Comando: "!adicionar"
-      
-*Excluir Fluxo*
-Comando: "!excluir"
-      
-*Cadastrar Resposta Rápida*
-Comando: "!rapida"
-      
-*Excluir Resposta Rápida*
-Comando: "!rapidaexcluir"
-      
-*Adicionar Remarketing*
-Comando: "!rmktadicionar"
-      
-*Excluir Remarketing*
-Comando: "!rmktexcluir"
-      
-*Pegar o ID de um grupo*
-Envie ao grupo: "Qual o id?"
-      
-*Excluir grupo*
-Comando: "!grupoexcluir"
-      
-*Criar Lista de Grupo*
-!listagrupo id_grupo listagrupo.json
-
-*Carregar Lista para Disparo*
-Comando: !listacarregar
-      
-*Disparar Mensagens*
-!listadisparo lista.json min_delay max_delay init_pos end_pos nome_fluxo`, "text");    
-} 
-
-  // Apenas TypeZap configurado
-  /*if (msg.fromMe && !existsTheDBSystem() && msg.body !== "!ativar" && readFlowSelf(msg.from) !== 'stepAtivar01' && msg.to === msg.from && !system_aux) {
-    await sendRequest(msg.from, `Você precisa registrar a URL principal do seu Typebot antes de usar o sistema. Digite !ativar e forneça a URL`, "text");
-    system_aux = true;
-    return
-  }*/
-
-  // Configurar Main Infos do Systema
+    // Chamar sendRequest ao invés de client.sendMessage
+    await sendRequest(msg.from, `*Sistema de Controle v1.0 - TypeZap*
+  
+  *Preparar Typebot (primeira ação)*
+  Comando: "!ativar"
+  
+  *Adicionar Novo Fluxo*
+  Comando: "!adicionar"
+        
+  *Excluir Fluxo*
+  Comando: "!excluir"
+        
+  *Cadastrar Resposta Rápida*
+  Comando: "!rapida"
+        
+  *Excluir Resposta Rápida*
+  Comando: "!rapidaexcluir"
+        
+  *Adicionar Remarketing*
+  Comando: "!rmktadicionar"
+        
+  *Excluir Remarketing*
+  Comando: "!rmktexcluir"
+        
+  *Pegar o ID de um grupo*
+  Envie ao grupo: "Qual o id?"
+        
+  *Excluir grupo*
+  Comando: "!grupoexcluir"
+        
+  *Criar Lista de Grupo*
+  !listagrupo id_grupo listagrupo.json
+  
+  *Carregar Lista para Disparo*
+  Comando: !listacarregar
+        
+  *Disparar Mensagens*
+  !listadisparo lista.json min_delay max_delay init_pos end_pos nome_fluxo`, "text");    
+  } 
+    // Configurar Main Infos do Systema
   if (msg.fromMe && msg.body === "!ativar" && !existsTheDBSystem() && msg.to === msg.from) {
-    await sendRequest(msg.from, `*Vamos preparar o seu TypeZap*
-
-Insira a URL do seu Typebot, por exemplo:
-https://seutypebot.vm.elestio.app/api/v1/sessions/`, "text");
-await delay(3000);
-addObjectSelf(msg.from, 'stepAtivar01', JSON.stringify(msg.id.id), 'done', null, null, null);
-  }
-
-  if (msg.fromMe && msg.body !== null && msg.to === msg.from && !existsTheDBSystem() && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepAtivar01' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
-    updateInteractSelf(msg.from, 'typing');
-    updateIdSelf(msg.from, JSON.stringify(msg.id.id));
-    updateURLRegistro(msg.from, msg.body);
-
-await sendRequest(msg.from, `Typebot preparado! 🚀
-
-${readURLRegistro(msg.from)}
-
-*Pode começar a usar o sistema* 🤖`, "text");
-await delay(2000);
-    addObjectSystem(await readURLRegistro(msg.from));
-    updateFlowSelf(msg.from,'stepAtivar02');
-    updateInteractSelf(msg.from, 'done');
-    deleteObjectSelf(msg.from);
-    await delay(100);
-  }  
-
+      await sendRequest(msg.from, `*Vamos preparar o seu TypeZap*
+  
+  Insira a URL do seu Typebot, por exemplo:
+  https://seutypebot.vm.elestio.app/api/v1/sessions/`, "text");
+  
+  addObjectSelf(msg.from, 'stepAtivar01', JSON.stringify(msg.id.id), 'done', null, null, null);
+    }
+  
+    if ((msg.body.startsWith('http://') || msg.body.startsWith('https://')) && msg.fromMe && msg.body !== null && msg.to === msg.from && !existsTheDBSystem() && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepAtivar01' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
+      updateInteractSelf(msg.from, 'typing');
+      updateIdSelf(msg.from, JSON.stringify(msg.id.id));
+      updateURLRegistro(msg.from, msg.body);
+  
+  await sendRequest(msg.from, `Typebot preparado! 🚀
+  
+  ${readURLRegistro(msg.from)}
+  
+  *Pode começar a usar o sistema* 🤖`, "text");
+  
+      addObjectSystem(await readURLRegistro(msg.from));
+      updateFlowSelf(msg.from,'stepAtivar02');
+      updateInteractSelf(msg.from, 'done');
+      deleteObjectSelf(msg.from);
+      
+    }
+  
   // Resetar Step Self
   if (msg.fromMe && msg.body === "00" && msg.to === msg.from) {
     deleteObjectSelf(msg.from);
@@ -2322,7 +2314,7 @@ _Resete o processo a qualquer momento digitando "00"_
    
   }
 
-  if (msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepAdicionar01' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
+  if ((msg.body.startsWith('http://') || msg.body.startsWith('https://')) && msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepAdicionar01' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
    updateInteractSelf(msg.from, 'typing');
     updateIdSelf(msg.from, JSON.stringify(msg.id.id));
     updateURLRegistro(msg.from, msg.body); 
@@ -2333,20 +2325,19 @@ O URL que adicionei é:
 
 ${readURLRegistro(msg.from)}
     
-Por favor, agora escreva o gatilho para ativar o seu fluxo. 🆔
+Por favor, agora escreva o gatilho para ativar o seu fluxo *precedido* de *"Gatilho: "*. 🆔
 Por exemplo:
-QUERO SABER MAIS
+Gatilho: QUERO SABER MAIS
 
 *Vamos lá, escreva abaixo* 🤖👥`, "text");
-await delay(2000);
     updateFlowSelf(msg.from,'stepAdicionar02');
     updateInteractSelf(msg.from, 'done');
   }
 
-  if (msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepAdicionar02' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
+  if (msg.body.startsWith('Gatilho: ') && msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepAdicionar02' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
     updateInteractSelf(msg.from, 'typing');
     updateIdSelf(msg.from, JSON.stringify(msg.id.id));
-    updateGatilho(msg.from, msg.body);
+    updateGatilho(msg.from, msg.body.split(" ").slice(1).join(" "));
 
 await sendRequest(msg.from, `Gatilho adicionado com sucesso! 🚀
 
@@ -2354,21 +2345,21 @@ O gatilho que adicionei é:
 
 ${readGatilho(msg.from)}
     
-Por favor, agora escreva o nome do seu fluxo para identificação, evite espaços e caracteres especiais. 🆔
-Por exemplo:
-meufluxo
+Por favor, agora escreva o nome do seu fluxo para identificação *precedido* de *Nome: *, evite espaços e caracteres especiais. 🆔
+Por exemplo
+Nome: meufluxo
 
 *Bora escolher um nome pro fluxo* 🤖👥`, "text");
-await delay(2000);
+
     updateFlowSelf(msg.from,'stepAdicionar03');
     updateInteractSelf(msg.from, 'done');
     
   }
 
-  if (msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepAdicionar03' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
+  if (msg.body.startsWith('Nome: ') && msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepAdicionar03' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
     updateInteractSelf(msg.from, 'typing');
     updateIdSelf(msg.from, JSON.stringify(msg.id.id));
-    updateName(msg.from, msg.body);
+    updateName(msg.from, msg.body.split(" ").slice(1).join(" "));
 
 await sendRequest(msg.from, `Nome adicionado com sucesso! 🚀
 
@@ -2379,7 +2370,6 @@ ${readName(msg.from)}
 Vou preparar tudo e setar o novo fluxo.
 
 *Preparando...* 🤖`, "text");
-await delay(2000);
 const typebotConfig = {
   url_registro: `${await readURLRegistro(msg.from)}`,
   gatilho: `${await readGatilho(msg.from)}`,
@@ -2393,12 +2383,10 @@ const typebotConfig = {
   
   ${JSON.stringify((listAllFromDB()))}
   
-  *Já pode usar o seu bot!* 🤖`, "text");
-  await delay(2000);
+  *Já pode usar o seu bot!* 🤖`, "text");  
     updateFlowSelf(msg.from,'stepAdicionar04');
     updateInteractSelf(msg.from, 'done');
-    deleteObjectSelf(msg.from);
-    await delay(1000);
+    deleteObjectSelf(msg.from);    
   }
 
   //Excluir fluxo
@@ -2406,75 +2394,77 @@ const typebotConfig = {
   if (msg.fromMe && msg.body === '!excluir' && msg.to === msg.from && !existsDBSelf(msg.from) && !msg.hasMedia) { 
     
 await sendRequest(msg.from, `Certo! 👍
-Insira o nome do fluxo para ser excluido. 📝
+Insira o nome do fluxo para ser excluido *precedido* de *Nome: *. 📝
+Exemplo
+Nome: meufluxo
 
 _Resete o processo a qualquer momento digitando "00"_
 *Escreva o nome abaixo* ⬇️`, "text");
-     await delay(3000);
+     
      addObjectSelf(msg.from, 'stepExcluir01', JSON.stringify(msg.id.id), 'done', null, null, null);
      
   }
 
-  if (msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepExcluir01' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
+  if (msg.body.startsWith('Nome: ') && msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepExcluir01' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
     
     updateInteractSelf(msg.from, 'typing');
     updateIdSelf(msg.from, JSON.stringify(msg.id.id));
-    updateName(msg.from, msg.body);
+    updateName(msg.from, msg.body.split(" ").slice(1).join(" "));
 
 await sendRequest(msg.from, `Buscando fluxo..
 
 O fluxo que encontrei é:
 
 ${readFromDB(msg.body)}`, "text");
-await delay(2000);
+
     removeFromDB(msg.body);
 
     await sendRequest(msg.from, '*Fluxo excluido com sucesso!* 🤖👥', "text");
-    await delay(2000);
+    
     updateFlowSelf(msg.from,'stepExcluir02');
     updateInteractSelf(msg.from, 'done');
     deleteObjectSelf(msg.from);
-    await delay(2000);
+    
   }
 
   //Cadastrar Resposta Rápida
   if (msg.fromMe && msg.body === '!rapida' && msg.to === msg.from && !existsDBSelf(msg.from) && !msg.hasMedia) { 
     
     await sendRequest(msg.from, `Entendido! 👍
-Diga o nome do fluxo do Typebot já cadastrado. 📝
-
-Por exemplo:\nmeufluxo\n 🛍️💬
+Diga o nome do fluxo do Typebot já cadastrado *precedido* de *Nome: *. 📝
+Exemplo
+Nome: meufluxo
 
 _Resete o processo a qualquer momento digitando "00"_
 *Escreva abaixo* ⬇️`,"text");
-await delay(3000);
      addObjectSelf(msg.from, 'stepRapida01', JSON.stringify(msg.id.id), 'done', null, null, null);
      
   }
 
-  if (msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepRapida01' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
+  if (msg.body.startsWith('Nome: ') && msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepRapida01' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
     
     updateInteractSelf(msg.from, 'typing');
     updateIdSelf(msg.from, JSON.stringify(msg.id.id));
-    updateName(msg.from, msg.body);
+    updateName(msg.from, msg.body.split(" ").slice(1).join(" "));
         
     await sendRequest(msg.from, `Certo, busquei o fluxo! 🚀
     
-Agora escreva a frase ou palavra chave para disparar o fluxo ao usuário. 🆔
-Por exemplo: "Estou muito feliz por te receber aqui"
+Agora escreva a frase ou palavra chave para disparar o fluxo ao usuário *precedido* de *"Gatilho: "*. 🆔
+Por exemplo:
+Gatilho: Estou muito feliz por te receber aqui
 
 *Vamos lá, escreva abaixo* 🤖👥`,"text");
-await delay(2000);
+
     updateFlowSelf(msg.from,'stepRapida02');
     updateInteractSelf(msg.from, 'done');
     
   }
 
-  if (msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepRapida02' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
+  if (msg.body.startsWith('Gatilho: ') && msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepRapida02' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
     
     updateInteractSelf(msg.from, 'typing');
     updateIdSelf(msg.from, JSON.stringify(msg.id.id));
-    updateGatilho(msg.from, msg.body);
+    updateGatilho(msg.from, msg.body.split(" ").slice(1).join(" "));
         
     await sendRequest(msg.from, `Palavra ou Frase chave adicionada com sucesso! 🚀
 
@@ -2483,14 +2473,14 @@ O chave que adicionei é:
 ${readGatilho(msg.from)}
 
 *Estou processando...* 🤖👥`,"text");
-await delay(2000);
+
      const rapidoConfig = {  
      gatilho: `${await readGatilho(msg.from)}`,
      name: `${await readName(msg.from)}`
      };
     addToDBTypebotV2(await readName(msg.from),rapidoConfig);
     await sendRequest(msg.from, `Tudo pronto, pode disparar o fluxo agora! 🚀`,"text");
-    await delay(2000);
+    
     updateFlowSelf(msg.from,'stepRapida03');
     updateInteractSelf(msg.from, 'done');
     deleteObjectSelf(msg.from);
@@ -2501,27 +2491,29 @@ await delay(2000);
 
   if (msg.fromMe && msg.body === '!rapidaexcluir' && msg.to === msg.from && !existsDBSelf(msg.from) && !msg.hasMedia) { 
     await sendRequest(msg.from, `Certo! 👍
-Insira o nome da Resposta Rápida para ser excluida. 📝
+Insira o nome da Resposta Rápida para ser excluida *precedido* de *Nome: *. 📝
+Exemplo
+Nome: meufluxo
 
 _Resete o processo a qualquer momento digitando "00"_
 *Escreva o nome abaixo* ⬇️`,"text");
-await delay(3000);
+
      addObjectSelf(msg.from, 'stepRapidaExcluir01', JSON.stringify(msg.id.id), 'done', null, null, null);     
   }
 
-  if (msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepRapidaExcluir01' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
+  if (msg.body.startsWith('Nome: ') && msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepRapidaExcluir01' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
    
     updateInteractSelf(msg.from, 'typing');
     updateIdSelf(msg.from, JSON.stringify(msg.id.id));
-    updateName(msg.from, msg.body);
+    updateName(msg.from, msg.body.split(" ").slice(1).join(" "));
         
     await sendRequest(msg.from, `Buscando Resposta Rápida..
 
 ${readFromDBTypebotV2(msg.body)}`,"text");
-await delay(2000);
+
     removeFromDBTypebotV2(msg.body);
     await sendRequest(msg.from, '*Resposta Rápida excluida com sucesso!* 🤖👥',"text");
-    await delay(2000);
+    
     updateFlowSelf(msg.from,'stepRapidaExcluir02');
     updateInteractSelf(msg.from, 'done');
     deleteObjectSelf(msg.from);
@@ -2543,7 +2535,7 @@ await delay(3000);
      
   }
 
-  if (msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepRmkt01' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
+  if ((msg.body.startsWith('http://') || msg.body.startsWith('https://')) && msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepRmkt01' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
     
     updateInteractSelf(msg.from, 'typing');
     updateIdSelf(msg.from, JSON.stringify(msg.id.id));
@@ -2555,20 +2547,22 @@ A URL que adicionei é:
 
 ${readURLRegistro(msg.from)}
     
-Por favor, agora escreva o nome do fluxo principal (já existente) que irá se associar ao Remarketing. 🆔
+Por favor, agora escreva o nome do fluxo principal (já existente) que irá se associar ao Remarketing *precedido* de *Nome: *. 🆔
+Exemplo
+Nome: fluxoprincipal
 
 *Bora associar ao fluxo principal* 🤖👥`,"text");
-await delay(2000);
+
     updateFlowSelf(msg.from,'stepRmkt02');
     updateInteractSelf(msg.from, 'done');
     
   }
 
-  if (msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepRmkt02' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
-    await delay(1000);
+  if (msg.body.startsWith('Nome: ') && msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepRmkt02' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
+    
     updateInteractSelf(msg.from, 'typing');
     updateIdSelf(msg.from, JSON.stringify(msg.id.id));
-    updateName(msg.from, msg.body);
+    updateName(msg.from, msg.body.split(" ").slice(1).join(" "));
         
     await sendRequest(msg.from, `Fluxo principal associado com sucesso! 🚀
 
@@ -2576,19 +2570,21 @@ O nome do fluxo que associei é:
 
 ${readName(msg.from)}
     
-Agora forneça o tempo (em dias) para o Remarketing ser disparado.
+Agora forneça o tempo (em dias) para o Remarketing ser disparado *precedido* de *Dias: *
+Exemplo
+Dias: 3
 
-*Escreva algo como 1 ou 5, por exemplo* 🤖`,"text");
-await delay(2000);
+*Sete seu tempo em 1 ou 5 dias, por exemplo* 🤖`,"text");
+
     updateFlowSelf(msg.from,'stepRmkt03');
     updateInteractSelf(msg.from, 'done');
-    await delay(2000);
+    
   }
 
-  if (msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepRmkt03' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
+  if (msg.body.startsWith('Dias: ') && msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepRmkt03' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
     updateInteractSelf(msg.from, 'typing');
     updateIdSelf(msg.from, JSON.stringify(msg.id.id));
-    updateGatilho(msg.from, msg.body);
+    updateGatilho(msg.from, msg.body.split(" ").slice(1).join(" "));
         
     await sendRequest(msg.from, `Tempo de dias registrado! 🚀
 
@@ -2599,7 +2595,7 @@ ${readGatilho(msg.from)} dias
 Vou preparar tudo e setar o novo Remarketing.
 
 *Preparando...* 🤖`,"text");
-await delay(2000);
+
     const urlRmkt = `${readURLRegistro(msg.from)}`;
     const typebotConfig = {
     disparo: `${await readGatilho(msg.from)}`,
@@ -2610,7 +2606,7 @@ await delay(2000);
     await sendRequest(msg.from, `Concluido! 🚀
 
 *Remarketing Registrado* 🤖`,"text");
-await delay(2000);
+
     updateFlowSelf(msg.from,'stepRmkt04');
     updateInteractSelf(msg.from, 'done');
     deleteObjectSelf(msg.from);
@@ -2624,27 +2620,27 @@ Insira o URL do fluxo de Remarketing que iremos excluir. 📝
 
 _Resete o processo a qualquer momento digitando "00"_
 *Escreva o URL abaixo* ⬇️`,"text");
-await delay(3000);
+
      addObjectSelf(msg.from, 'stepExcluirRmkt01', JSON.stringify(msg.id.id), 'done', null, null, null);
      
   }
 
-  if (msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepExcluirRmkt01' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
+  if ((msg.body.startsWith('http://') || msg.body.startsWith('https://')) && msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepExcluirRmkt01' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
     
     updateInteractSelf(msg.from, 'typing');
     updateIdSelf(msg.from, JSON.stringify(msg.id.id));
     updateURLRegistro(msg.from, msg.body);
         
     await sendRequest(msg.from, `Buscando fluxo de Remarketing..`,"text");
-    await delay(2000);
+    
     removeFromDBTypebotV3(msg.body);
     removeFromDBTypebotV4withURL(msg.body);
     await sendRequest(msg.from, '*Fluxo de Remarketing excluido com sucesso!* 🤖👥',"text");
-    await delay(2000);
+    
     updateFlowSelf(msg.from,'stepExcluirRmkt02');
     updateInteractSelf(msg.from, 'done');
     deleteObjectSelf(msg.from);
-    await delay(2000);
+    
   }  
 
   //Excluir Grupo
@@ -2655,22 +2651,22 @@ Insira o ID do grupo que iremos excluir. 📝
 
 _Resete o processo a qualquer momento digitando "00"_    
 *Escreva o ID abaixo* ⬇️`,"text");
-await delay(3000);
+
      addObjectSelf(msg.from, 'stepExcluirGrupo01', JSON.stringify(msg.id.id), 'done', null, null, null);
      
   }
 
-  if (msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepExcluirGrupo01' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
+  if (msg.body.endsWith('@g.us') && msg.fromMe && msg.body !== null && msg.to === msg.from && existsDBSelf(msg.from) && readFlowSelf(msg.from) === 'stepExcluirGrupo01' && readIdSelf(msg.from) !== JSON.stringify(msg.id.id) && readInteractSelf(msg.from) === 'done' && !msg.hasMedia) {
     
     updateInteractSelf(msg.from, 'typing');
     updateIdSelf(msg.from, JSON.stringify(msg.id.id));
     updateURLRegistro(msg.from, msg.body);
         
     await sendRequest(msg.from, `Buscando Grupos..`,"text");
-    await delay(2000);
+    
     removeFromDBTypebotV5(msg.body);
     await sendRequest(msg.from, '*Grupo excluido com sucesso!* 🤖👥',"text");
-    await delay(2000);
+    
     updateFlowSelf(msg.from,'stepExcluirGrupo02');
     updateInteractSelf(msg.from, 'done');
     deleteObjectSelf(msg.from);
