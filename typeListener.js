@@ -1,6 +1,7 @@
 const fs = require('fs');
 const axios = require('axios');
-const fetch = require('node-fetch');
+//const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 const qrcode = require('qrcode-terminal');
 const path = require('path');
 const { Client, Buttons, List, MessageMedia, LocalAuth, Poll } = require('whatsapp-web.js');
